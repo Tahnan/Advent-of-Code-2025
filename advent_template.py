@@ -8,15 +8,15 @@ TEST_CASE = """
 
 def parse_data(data):
     # pre-defined in case it's needed
-    pass
+    return data
 
 
 def part_one(data=TEST_CASE, debug=False):
-    pass
+    data = parse_data(data)
 
 
 def part_two(data=TEST_CASE, debug=False):
-    pass
+    data = parse_data(data)
 
 
 if __name__ == '__main__':
