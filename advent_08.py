@@ -92,6 +92,13 @@ class CircuitMaintainer:
                 self._box_to_circuit[box] = current_one
             self._circuit_to_boxes[current_one] += boxes_in_two
 
+        if not self.boxes_to_anticipate:
+            return
+        if len(self._circuit_to_boxes) > 1:
+            return
+        if len(min(self._circuit_to_boxes.values())) == self.boxes_to_anticipate:
+            return True
+
     def get_three_largest(self):
         sizes = [len(circuit) for circuit in self._circuit_to_boxes.values()]
         sizes.sort(reverse=True)
@@ -130,6 +137,11 @@ def part_two(data=TEST_CASE, debug=False):
     very_naive_list = list(itertools.combinations(boxes, 2))
     very_naive_list.sort(key=lambda x: distance(*x))
 
+    circuits = CircuitMaintainer(boxes_to_anticipate=len(boxes))
+    for one, two in very_naive_list:
+        is_it_done = circuits.add_pair(one, two)
+        if is_it_done:
+            return one[0] * two[0]
 
 
 if __name__ == '__main__':
