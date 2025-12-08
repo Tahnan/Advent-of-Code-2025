@@ -32,31 +32,6 @@ def distance(a, b):
     return sum((x - y) ** 2 for x, y in zip(a, b)) ** .5
 
 
-class ShortestDistanceList:
-    def __init__(self, size):
-        self._size = size
-        self._distances = {}
-        self._max_distance = 0
-
-    def get_list(self):
-        return self._distances.values()
-
-    def add_pair(self, one, two):
-        dist = distance(one, two)
-        if dist in self._distances:
-            # Hoping that the idea is that all distances are unique...
-            raise ValueError('Existing distance found!')
-        if len(self._distances) < self._size:
-            self._max_distance = max(self._max_distance, dist)
-            self._distances[dist] = (one, two)
-            return
-        if dist > self._max_distance:
-            return
-        self._max_distance = max(self._max_distance, dist)
-        self._distances[dist] = (one, two)
-        del self._distances[max(self._distances)]
-
-
 class CircuitMaintainer:
     def __init__(self, boxes_to_anticipate=None):
         self._box_to_circuit = {}
@@ -117,14 +92,12 @@ def parse_data(data):
 
 def part_one(data=TEST_CASE, debug=False):
     boxes = parse_data(data)
+    complete_list = list(itertools.combinations(boxes, 2))
+    complete_list.sort(key=lambda x: distance(*x))
+
     connections_to_make = 10 if data == TEST_CASE else 1000
-
-    distance_list = ShortestDistanceList(connections_to_make)
-    for one, two in itertools.combinations(boxes, 2):
-        distance_list.add_pair(one, two)
-
     circuits = CircuitMaintainer()
-    for one, two in distance_list.get_list():
+    for one, two in complete_list[:connections_to_make]:
         circuits.add_pair(one, two)
     # if debug:
     #     circuits.report()
@@ -134,11 +107,11 @@ def part_one(data=TEST_CASE, debug=False):
 
 def part_two(data=TEST_CASE, debug=False):
     boxes = parse_data(data)
-    very_naive_list = list(itertools.combinations(boxes, 2))
-    very_naive_list.sort(key=lambda x: distance(*x))
+    complete_list = list(itertools.combinations(boxes, 2))
+    complete_list.sort(key=lambda x: distance(*x))
 
     circuits = CircuitMaintainer(boxes_to_anticipate=len(boxes))
-    for one, two in very_naive_list:
+    for one, two in complete_list:
         is_it_done = circuits.add_pair(one, two)
         if is_it_done:
             return one[0] * two[0]
@@ -151,12 +124,14 @@ if __name__ == '__main__':
     with input_file.open() as f:
         DATA = f.read()
 
-    print(time.ctime(), 'Start')
+    print('Starting:', time.ctime())
     for fn, kwargs in (
         (part_one, {'debug': True}),
         (part_one, {'data': DATA}),
         (part_two, {}),
         (part_two, {'data': DATA}),
     ):
+        start_time = time.monotonic()
         result = fn(**kwargs)
-        print(time.ctime(), result)
+        time_taken = f"{time.monotonic() - start_time :.3}:"
+        print(f'{time_taken:<6} {result}')

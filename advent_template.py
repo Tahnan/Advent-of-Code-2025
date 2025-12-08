@@ -26,12 +26,14 @@ if __name__ == '__main__':
     with input_file.open() as f:
         DATA = f.read()
 
-    print(time.ctime(), 'Start')
+    print('Starting:', time.ctime())
     for fn, kwargs in (
-        (part_one, {}),
+        (part_one, {'debug': True}),
         (part_one, {'data': DATA}),
         (part_two, {}),
         (part_two, {'data': DATA}),
     ):
+        start_time = time.monotonic()
         result = fn(**kwargs)
-        print(time.ctime(), result)
+        time_taken = f"{time.monotonic() - start_time :.3}:"
+        print(f'{time_taken:<6} {result}')
