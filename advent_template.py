@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     print('Starting:', time.ctime())
     for fn, kwargs in (
-        (part_one, {'debug': True}),
+        (part_one, {}),
         (part_one, {'data': DATA}),
         (part_two, {}),
         (part_two, {'data': DATA}),
