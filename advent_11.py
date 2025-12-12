@@ -115,6 +115,29 @@ def part_two(data=TEST_CASE_TWO, debug=False):
     return total_paths
 
 
+def part_two_original_formula(data=TEST_CASE_TWO, debug=False):
+    network = parse_data(data)
+    paths = {('svr', 0): 1}
+    found = 0
+    while paths:
+        new_paths = Counter()
+        for (loc, tracking), count in paths.items():
+            for dest in network[loc]:
+                if dest == 'out':
+                    if tracking == DAC | FFT:
+                        found += count
+                else:
+                    new_tracking = tracking
+                    if dest == 'fft':
+                        new_tracking |= FFT
+                    elif dest == 'dac':
+                        new_tracking |= DAC
+                    new_paths[(dest, new_tracking)] += count
+        paths = new_paths
+        print(' >', len(paths), sum(paths.values()), found)
+    return found
+
+
 if __name__ == '__main__':
     import time
     day = Path(__file__).name[7:9]
@@ -128,6 +151,7 @@ if __name__ == '__main__':
         (part_one, {'data': DATA}),
         (part_two, {}),
         (part_two, {'debug': True, 'data': DATA}),
+        (part_two_original_formula, {'data': DATA}),
     ):
         start_time = time.monotonic()
         result = fn(**kwargs)
